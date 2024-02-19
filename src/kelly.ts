@@ -1,5 +1,5 @@
 /** @param {NS} ns */
-export async function main(ns: NS) {
+export async function main(ns: NS): Promise<void> {
   const tix = ns.stock;
   while (true) {
     await kelly(ns);
@@ -42,7 +42,7 @@ const kelly = async (ns: NS) => {
     .sort((a, b) => b.growthRate - a.growthRate);
 
   for (const idealPosition of idealPositions) {
-    const { stockSymbol, idealNumShares, kellyRatio } = idealPosition;
+    const { stockSymbol, kellyRatio } = idealPosition;
     const [longPosition, , shortPosition,] = tix.getPosition(stockSymbol);
 
     if (kellyRatio > 0) {
