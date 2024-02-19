@@ -3,23 +3,24 @@ import { progressBar } from 'progressBar.js'
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
+
   ns.atExit(() => {
     ns.ui.clearTerminal();
   })
   while (true) {
-    await printLoads(ns);
+    await printLoads(ns, 55);
     // break;
     await ns.sleep(100);
   }
 }
 
 /** @param {NS} ns */
-const printLoads = async (ns: NS) => {
+const printLoads = async (ns: NS, size: number) => {
   const serverLoads = await getServerLoads(ns);
   const progressBars = serverLoads.map(
     serverLoad => {
       const { load } = serverLoad;
-      const progress = progressBar(load, 50)
+      const progress = progressBar(load, size)
       return { ...serverLoad, progressBar: progress };
     }
   )
@@ -27,12 +28,15 @@ const printLoads = async (ns: NS) => {
   ns.ui.clearTerminal()
 
   const maxServerNameLength = Math.max(...progressBars.map(info => info.serverName.length))
+  const largestServerMoney = Math.max(...progressBars.map(info => info.moneyMax))
+  
 
   for (const serverLoadInfo of progressBars) {
     const { usedRam, moneyMax } = serverLoadInfo;
-    if (usedRam + moneyMax === 0) {
+    if (usedRam === 0 && moneyMax < largestServerMoney / 1000) {
       continue
     }
+
     printServerInfo(ns, serverLoadInfo, maxServerNameLength);
 
 
