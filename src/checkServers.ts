@@ -61,6 +61,10 @@ function canHost(ns: NS, serverName: string): boolean {
   if (ns.getServerMaxRam(serverName) === 0 ) {
     return false;
   }
+
+  if (serverName.includes('hacknet')) { 
+    return false;
+  }
   
   return true;
 }

@@ -6,18 +6,17 @@ export async function main(ns: NS): Promise<void> {
     const numHacknetNodes = hackNet.numNodes()
 
     const hacknetProduction = [...Array(numHacknetNodes).keys()]
-    .map((nodeNumber: number) => {
-      const stats = hackNet.getNodeStats(nodeNumber);
+      .map((nodeNumber: number) => {
+        const stats = hackNet.getNodeStats(nodeNumber);
 
-      return stats.production;
-    })
-    .reduce(
-      (accumulator: number, currentProduction: number) => accumulator + currentProduction, 0
-    )
+        return stats.production;
+      })
+      .reduce((accumulator: number, currentProduction: number) => accumulator + currentProduction, 0)
 
-    const nodePurchaseCost = hackNet.getPurchaseNodeCost()
+    const nodePurchaseCost = hackNet.getPurchaseNodeCost();
 
-    if (hackNet.maxNumNodes() >= numHacknetNodes && nodePurchaseCost < ns.getServerMoneyAvailable('home') && nodePurchaseCost < hacknetProduction / 3600){
+
+    if (hackNet.maxNumNodes() >= numHacknetNodes && nodePurchaseCost < ns.getServerMoneyAvailable('home') && (nodePurchaseCost < hacknetProduction * 2 * 3600 || hacknetProduction === 0)) {
       hackNet.purchaseNode()
     }
 

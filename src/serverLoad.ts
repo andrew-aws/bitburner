@@ -1,4 +1,4 @@
-import { getAccessibleServers } from 'checkServers'
+import { getAllHostServers } from 'checkServers'
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
@@ -39,7 +39,7 @@ export async function getServerLoad(ns: NS): Promise<{ usedRam: number, maxRam: 
 
 /** @param {NS} ns */
 export async function getServerLoads(ns: NS): Promise<ServerLoadInfo[]> {
-  const serverNames = await getAccessibleServers(ns);
+  const serverNames = await getAllHostServers(ns);
 
   const serverLoads = serverNames.map(
     (serverName: string) => {
