@@ -37,12 +37,10 @@ export async function main(ns: NS): Promise<void> {
         }
       }
 
-      const hacknetMoney = ns.getMoneySources().sinceInstall.hacknet;
-      const hacknetCost = ns.getMoneySources().sinceInstall.hacknet_expenses;
-      const hacknetProfit = hacknetCost + hacknetMoney;
-      if (hacknetProfit) {
-        headers.push('Hacknet');
-        values.push(`$${ns.formatNumber(hacknetProfit)}`);
+      const hacknetHashes = ns.hacknet.numHashes()
+      if (hacknetHashes) {
+        headers.push('Hacknet Hashes');
+        values.push(`${ns.formatNumber(hacknetHashes)}`);
       }
 
       // Now drop it into the placeholder elements

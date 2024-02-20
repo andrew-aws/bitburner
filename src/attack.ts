@@ -20,9 +20,9 @@ const attackServers = async (ns: NS) => {
     // .slice(0, 1)
 
     for (const targetServerName of targetServers) {
-      // if (['syscore','foodnstuff'].includes(targetServerName) === false) {
-      //   continue;
-      // }
+      if (['harakiri-sushi'].includes(targetServerName) === false) {
+        continue;
+      }
 
       // if (getServerStockMap().find(serverInfo => serverInfo.serverName === targetServerName) === undefined) {
       //   continue;
