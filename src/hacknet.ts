@@ -39,26 +39,26 @@ const managerHacknetServers = (ns: NS) => {
             hacknet.upgradeCore(nodeNumber);
         }
 
-        if (ns.getPlayer().money > ramUpgradeCost && ramUpgradeCost < upgradeThreshold) {
-            hacknet.upgradeRam(nodeNumber);
-        }
-
         if (ns.getPlayer().money > levelUpgradeCost && levelUpgradeCost < upgradeThreshold) {
             hacknet.upgradeLevel(nodeNumber);
+        }
+
+        if (ns.getPlayer().money > ramUpgradeCost && ramUpgradeCost < upgradeThreshold) {
+            hacknet.upgradeRam(nodeNumber);
         }
     }
 
 }
 
 const spendHashes = (ns: NS) => {
-    const target = 'harakiri-sushi';
+    // const target = 'harakiri-sushi';
 
-    if (reduceSecurity(ns, target)) {
-        return true;
-    }
-    if (raiseMoneyCap(ns, target)) {
-        return true;
-    }
+    // if (reduceSecurity(ns, target)) {
+    //     return true;
+    // }
+    // if (raiseMoneyCap(ns, target)) {
+    //     return true;
+    // }
     if (sellForMoney(ns)) {
         return true;
     }
@@ -76,6 +76,7 @@ const reduceSecurity = (ns: NS, target: string) => {
 
         if (numHashes > upgradeCost) {
             hacknet.spendHashes(upgradeName, target);
+            ns.toast(`Reducing ${target} minimum security`, 'info');
             return true;
         }
     }
@@ -92,6 +93,7 @@ const raiseMoneyCap = (ns: NS, target: string) => {
 
         if (numHashes > upgradeCost) {
             hacknet.spendHashes(upgradeName, target);
+            ns.toast(`Increasing ${target} maximum money`, 'info');
             return true;
         }
     }

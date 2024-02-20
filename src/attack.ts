@@ -16,13 +16,12 @@ const attackServers = async (ns: NS) => {
     const targetServers = (await getAllHackableServers(ns))
       .filter((server: string) => ns.getServerMaxMoney(server) > 0)
       .sort((a: string, b: string) => getHackability(ns, a) - getHackability(ns, b))
-      
-    // .slice(0, 1)
+      .slice(0, 1)
 
     for (const targetServerName of targetServers) {
-      if (['harakiri-sushi'].includes(targetServerName) === false) {
-        continue;
-      }
+      // if (['n00dles'].includes(targetServerName) === false) {
+      //   continue;
+      // }
 
       // if (getServerStockMap().find(serverInfo => serverInfo.serverName === targetServerName) === undefined) {
       //   continue;

@@ -37,11 +37,18 @@ export async function main(ns: NS): Promise<void> {
         }
       }
 
-      const hacknetHashes = ns.hacknet.numHashes()
-      if (hacknetHashes) {
-        headers.push('Hacknet Hashes');
-        values.push(`${ns.formatNumber(hacknetHashes)}`);
+      const hashRate = getHashRate(ns)
+      if (hashRate) {
+        headers.push('Hash Rate');
+        values.push(`${ns.formatNumber(hashRate)}`);
       }
+      
+      // const karma = ns.heart.break();
+      // if (karma) {
+      //   headers.push('Karma');
+      //   values.push(`${ns.formatNumber(karma)}`);
+      // }
+
 
       // Now drop it into the placeholder elements
       hook0.innerText = headers.join(" \n");
@@ -55,4 +62,20 @@ export async function main(ns: NS): Promise<void> {
     }
     await ns.sleep(100);
   }
+}
+
+const getHashRate = (ns: NS): number => {
+  const {hacknet} = ns;
+
+  const numHacknetServers = hacknet.numNodes();
+
+  const hacknetProduction = [...Array(numHacknetServers).keys()].map(
+    (hacknetIndex: number) => hacknet.getNodeStats(hacknetIndex).production
+  )
+  .reduce(
+    (accumulator: number, currentValue: number) => accumulator + currentValue, 0
+  )
+
+
+  return hacknetProduction;
 }

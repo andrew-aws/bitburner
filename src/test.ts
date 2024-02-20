@@ -1,4 +1,16 @@
 export async function main(ns: NS): Promise<void> {
-    ns.tprint('test');
+    for (let i=0; i<10; i++){
+        ns.tprint(`${i} ${isEven(i)}`);
 
+    }
+}
+
+const isEven = (number: number): boolean => {
+    if (number === 0) {
+        return true;
+    }
+
+    const normNumber = Math.abs(number);
+
+    return !isEven(normNumber - 1);
 }
