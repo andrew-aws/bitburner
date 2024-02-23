@@ -3,7 +3,7 @@ import { NS } from '@ns'
 export async function main(ns: NS): Promise<void> {
     while (true) {
         await ns.sleep(10);
-        managerHacknetServers(ns);
+        // managerHacknetServers(ns);
         spendHashes(ns);
     }
 }
@@ -33,20 +33,24 @@ const managerHacknetServers = (ns: NS) => {
         const hashRate = hacknet.getNodeStats(nodeNumber).production;
 
         if (ns.getPlayer().money > cacheUpgradeCost && cacheUpgradeCost < upgradeThreshold) {
-            if (hashCapacity !== undefined && hashCapacity < 1 * 3600 * hashRate) {
+            if (hashCapacity !== undefined && hashCapacity < 4 * 3600 * hashRate) {
+                ns.toast(`Upgrading hacknet-server-${nodeNumber} cache`,'info')
                 hacknet.upgradeCache(nodeNumber);
             }
         }
-
+        
         if (ns.getPlayer().money > coreUpgradeCost && coreUpgradeCost < upgradeThreshold) {
+            ns.toast(`Upgrading hacknet-server-${nodeNumber} cores`,'info')
             hacknet.upgradeCore(nodeNumber);
         }
-
+        
         if (ns.getPlayer().money > levelUpgradeCost && levelUpgradeCost < upgradeThreshold) {
+            ns.toast(`Upgrading hacknet-server-${nodeNumber} level`,'info')
             hacknet.upgradeLevel(nodeNumber);
         }
-
+        
         if (ns.getPlayer().money > ramUpgradeCost && ramUpgradeCost < upgradeThreshold) {
+            ns.toast(`Upgrading hacknet-server-${nodeNumber} ram`,'info')
             hacknet.upgradeRam(nodeNumber);
         }
     }
@@ -111,11 +115,11 @@ const sellForMoney = (ns: NS) => {
     const { hacknet } = ns;
     const upgradeName = 'Sell for Money'
     const upgradeCost = hacknet.hashCost(upgradeName);
-    // const maxHashes = hacknet.hashCapacity();
-    // const numHashes = hacknet.numHashes();
+    const numHashes = ns.hacknet.numHashes();
+    const numAfforadableUpgrades = Math.floor(numHashes/upgradeCost);
 
-    if (ns.getPlayer().money > upgradeCost) {
-        hacknet.spendHashes(upgradeName);
+    if (numAfforadableUpgrades > 0) {
+        hacknet.spendHashes(upgradeName, '', numAfforadableUpgrades);
         return true;
     }
 
