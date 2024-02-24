@@ -3,7 +3,7 @@ import { NS } from '@ns'
 export async function main(ns: NS): Promise<void> {
     while (true) {
         await ns.sleep(10);
-        // managerHacknetServers(ns);
+        managerHacknetServers(ns);
         spendHashes(ns);
     }
 }
@@ -34,23 +34,23 @@ const managerHacknetServers = (ns: NS) => {
 
         if (ns.getPlayer().money > cacheUpgradeCost && cacheUpgradeCost < upgradeThreshold) {
             if (hashCapacity !== undefined && hashCapacity < 4 * 3600 * hashRate) {
-                ns.toast(`Upgrading hacknet-server-${nodeNumber} cache`,'info')
+                ns.toast(`Upgrading hacknet-server-${nodeNumber} cache`, 'info')
                 hacknet.upgradeCache(nodeNumber);
             }
         }
-        
+
         if (ns.getPlayer().money > coreUpgradeCost && coreUpgradeCost < upgradeThreshold) {
-            ns.toast(`Upgrading hacknet-server-${nodeNumber} cores`,'info')
+            ns.toast(`Upgrading hacknet-server-${nodeNumber} cores`, 'info')
             hacknet.upgradeCore(nodeNumber);
         }
-        
+
         if (ns.getPlayer().money > levelUpgradeCost && levelUpgradeCost < upgradeThreshold) {
-            ns.toast(`Upgrading hacknet-server-${nodeNumber} level`,'info')
+            ns.toast(`Upgrading hacknet-server-${nodeNumber} level`, 'info')
             hacknet.upgradeLevel(nodeNumber);
         }
-        
+
         if (ns.getPlayer().money > ramUpgradeCost && ramUpgradeCost < upgradeThreshold) {
-            ns.toast(`Upgrading hacknet-server-${nodeNumber} ram`,'info')
+            ns.toast(`Upgrading hacknet-server-${nodeNumber} ram`, 'info')
             hacknet.upgradeRam(nodeNumber);
         }
     }
@@ -60,11 +60,17 @@ const managerHacknetServers = (ns: NS) => {
 const spendHashes = (ns: NS) => {
     const target = 'blade';
 
-    if (ns.getPlayer().skills.hacking > ns.getServerRequiredHackingLevel(target)) {
-        if (reduceSecurity(ns, target)) {
-            return true;
+    if (ns.getPlayer().money > 0) {
+        if (ns.getPlayer().skills.hacking > ns.getServerRequiredHackingLevel(target)) {
+            if (reduceSecurity(ns, target)) {
+                return true;
+            }
+            if (raiseMoneyCap(ns, target)) {
+                return true;
+            }
         }
-        if (raiseMoneyCap(ns, target)) {
+
+        if (improveStudying(ns)) {
             return true;
         }
     }
@@ -73,8 +79,25 @@ const spendHashes = (ns: NS) => {
         return true;
     }
 
+
     return false;
 
+}
+
+const improveStudying = (ns: NS) => {
+    const { hacknet } = ns;
+    const numHashes = hacknet.numHashes();
+    const upgradeName = 'Improve Studying'
+    const upgradeCost = hacknet.hashCost(upgradeName);
+
+    if (numHashes > upgradeCost) {
+        hacknet.spendHashes(upgradeName);
+        ns.toast(`Improving Studying`, 'info');
+        return true;
+    }
+
+
+    return false;
 }
 
 const reduceSecurity = (ns: NS, target: string) => {
@@ -115,10 +138,12 @@ const sellForMoney = (ns: NS) => {
     const { hacknet } = ns;
     const upgradeName = 'Sell for Money'
     const upgradeCost = hacknet.hashCost(upgradeName);
-    const numHashes = ns.hacknet.numHashes();
-    const numAfforadableUpgrades = Math.floor(numHashes/upgradeCost);
+    const numHashes = hacknet.numHashes();
+    const numAfforadableUpgrades = Math.floor(numHashes / upgradeCost);
 
-    if (numAfforadableUpgrades > 0) {
+    const hashCapacity = hacknet.hashCapacity();
+
+    if (hashCapacity === numHashes && numAfforadableUpgrades > 0) {
         hacknet.spendHashes(upgradeName, '', numAfforadableUpgrades);
         return true;
     }
