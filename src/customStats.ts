@@ -43,11 +43,11 @@ export async function main(ns: NS): Promise<void> {
         values.push(`${ns.formatNumber(hashRate)}`);
       }
       
-      // const hashes = ns.hacknet.numHashes();
-      // if (hashes) {
-      //   headers.push('Hashes');
-      //   values.push(`${ns.formatNumber(hashes)}`);
-      // }
+      const hashes = ns.hacknet.numHashes();
+      if (hashes) {
+        headers.push('Hashes');
+        values.push(`${ns.formatNumber(hashes)}`);
+      }
       
       // const karma = ns.heart.break();
       // if (karma) {
@@ -66,7 +66,7 @@ export async function main(ns: NS): Promise<void> {
     } catch (err) { // This might come in handy later
       ns.print("ERROR: Update Skipped: " + String(err));
     }
-    await ns.sleep(100);
+    await ns.sleep(1000);
   }
 }
 
