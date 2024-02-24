@@ -3,9 +3,13 @@ import { getAccess } from 'getAccess'
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
-  const sortedServers = await checkServers(ns)
-  for (const serverInfo of sortedServers) {
-    ns.tprint(serverInfo)
+  const sortedServers = await getAllHackableServers(ns);
+  for (const serverName of sortedServers) {
+    const moneyMax = ns.getServerMaxMoney(serverName);
+    const minSecurity = ns.getServerMinSecurityLevel(serverName);
+    const growthRate = ns.getServerGrowth(serverName);
+    const hackability = moneyMax * growthRate/ minSecurity;
+    ns.tprint(`${serverName} ${ns.formatNumber(hackability)}`)
   }
 }
 

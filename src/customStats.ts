@@ -11,6 +11,7 @@ export async function main(ns: NS): Promise<void> {
     return;
   }
   while (true) {
+    await ns.sleep(100);
     try {
       const headers = [];
       const values = [];
@@ -44,7 +45,7 @@ export async function main(ns: NS): Promise<void> {
       }
       
       const hashes = ns.hacknet.numHashes();
-      if (hashes) {
+      if (hashes > 0 && hashRate < 4) {
         headers.push('Hashes');
         values.push(`${ns.formatNumber(hashes)}`);
       }
@@ -66,7 +67,6 @@ export async function main(ns: NS): Promise<void> {
     } catch (err) { // This might come in handy later
       ns.print("ERROR: Update Skipped: " + String(err));
     }
-    await ns.sleep(1000);
   }
 }
 

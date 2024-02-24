@@ -3,7 +3,7 @@ import { NS } from '@ns'
 export async function main(ns: NS): Promise<void> {
     while (true) {
         await ns.sleep(10);
-        managerHacknetServers(ns);
+        // managerHacknetServers(ns);
         spendHashes(ns);
     }
 }
@@ -58,22 +58,22 @@ const managerHacknetServers = (ns: NS) => {
 }
 
 const spendHashes = (ns: NS) => {
-    // const target = 'blade';
+    const target = 'silver-helix';
 
-    // if (ns.getPlayer().money > 0) {
-    //     if (ns.getPlayer().skills.hacking > ns.getServerRequiredHackingLevel(target)) {
-    //         if (reduceSecurity(ns, target)) {
-    //             return true;
-    //         }
-    //         if (raiseMoneyCap(ns, target)) {
-    //             return true;
-    //         }
-    //     }
+    if (ns.getPlayer().money > 0) {
+        if (ns.getPlayer().skills.hacking > ns.getServerRequiredHackingLevel(target)) {
+            if (reduceSecurity(ns, target)) {
+                return true;
+            }
+            if (raiseMoneyCap(ns, target)) {
+                return true;
+            }
+        }
 
-    //     if (improveStudying(ns)) {
-    //         return true;
-    //     }
-    // }
+        // if (improveStudying(ns)) {
+        //     return true;
+        // }
+    }
 
     if (sellForMoney(ns)) {
         return true;

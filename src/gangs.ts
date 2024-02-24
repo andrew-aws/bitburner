@@ -1,14 +1,23 @@
 /** @param {NS} ns */
-export async function main(ns: NS) {
+export async function main(ns: NS): Promise<void> {
 
   while (true) {
 
+    recruit(ns);
     setTasks(ns);
     manageEquipment(ns);
 
-
     // return 
     await ns.gang.nextUpdate();
+  }
+}
+
+const recruit = (ns: NS) => {
+  const canRecruit = ns.gang.canRecruitMember();
+  if (canRecruit){
+    const newMemberName = getNewMemberName(ns);
+    ns.gang.recruitMember(newMemberName);
+    ns.gang.setMemberTask(newMemberName, 'Train Combat');
   }
 }
 
@@ -20,7 +29,9 @@ const setTasks = (ns: NS) => {
 
   const names = gang.getMemberNames();
   for (const name of names) {
-    gang.setMemberTask(name, taskName);
+    if (gang.getMemberInformation(name).task.includes('Train') === false){
+      gang.setMemberTask(name, taskName);
+    }
   }
 
   return names.map(name => gang.getAscensionResult(name));
@@ -28,8 +39,8 @@ const setTasks = (ns: NS) => {
 
 /** @param {NS} ns */
 const decideTask = (ns: NS) => {
-  const wantedPenaltyThreshold = 0.0995;
-  const powerThreshold = 5000;
+  const wantedPenaltyThreshold = 0.9;
+  const powerThreshold = 0;
   const gangInfo = ns.gang.getGangInformation();
 
   const gangWantedPenalty = gangInfo.wantedPenalty;
@@ -43,7 +54,7 @@ const decideTask = (ns: NS) => {
     return 'Territory Warfare';
   }
 
-  return 'Human Trafficking';
+  return 'Mug People';
 
 }
 
@@ -69,5 +80,28 @@ const manageEquipment = (ns: NS) => {
       }
     }
   }
+}
+
+const getNewMemberName = (ns: NS) => {
+  const possibleNames = [
+    'Bill',
+    'Ted',
+    'Steve',
+    'Jack',
+    'Tug',
+    'Maya',
+    'Fred',
+    'Hannah',
+    'Craig',
+    'Kirk',
+    'Chris',
+    'Bob',
+    'Dan',
+    'Ken',
+    'Beth'
+    ]
+    const currentNames = ns.gang.getMemberNames();
+
+    return possibleNames.filter(name => currentNames.includes(name) === false)[0]
 }
 
