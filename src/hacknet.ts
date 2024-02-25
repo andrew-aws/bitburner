@@ -3,7 +3,7 @@ import { NS } from '@ns'
 export async function main(ns: NS): Promise<void> {
     while (true) {
         await ns.sleep(10);
-        // managerHacknetServers(ns);
+        managerHacknetServers(ns);
         spendHashes(ns);
     }
 }
@@ -70,9 +70,9 @@ const spendHashes = (ns: NS) => {
             }
         }
 
-        // if (improveStudying(ns)) {
-        //     return true;
-        // }
+        if (improveStudying(ns)) {
+            return true;
+        }
     }
 
     if (sellForMoney(ns)) {
@@ -141,8 +141,8 @@ const sellForMoney = (ns: NS) => {
     const numHashes = hacknet.numHashes();
     const numAfforadableUpgrades = Math.floor(numHashes / upgradeCost);
 
-    const hashCapacity = hacknet.hashCapacity();
-    const hashThreshold = 0*hashCapacity;
+    // const hashCapacity = hacknet.hashCapacity();
+    const hashThreshold = 0 * getTotalProduction(ns);
 
 
     if (hashThreshold <= numHashes && numAfforadableUpgrades > 0) {
@@ -152,4 +152,14 @@ const sellForMoney = (ns: NS) => {
 
     return false;
 
+}
+
+const getTotalProduction = (ns: NS) => {
+    const numHacknetServers = ns.hacknet.numNodes();
+
+    const totalProduction = [...Array(numHacknetServers).keys()]
+    .map(serverNumber => ns.hacknet.getNodeStats(serverNumber).production)
+    .reduce((accumulator, currentValue) => accumulator + currentValue,0)
+
+    return totalProduction;
 }

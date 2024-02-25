@@ -54,7 +54,7 @@ const decideTask = (ns: NS) => {
     return 'Territory Warfare';
   }
 
-  return 'Mug People';
+  return 'Strongarm Civilians';
 
 }
 
