@@ -10,7 +10,7 @@ export async function main(ns: NS): Promise<number> {
 
   const amountStolen = await ns.hack(target, {stock: stockInfluence})
 
-  // const minAmountToReport = 0;
+  // const minAmountToReport = 1e6;
 
   // if (amountStolen > minAmountToReport) {
   //   // ns.tprint('Hacked ',target,' for $',ns.formatNumber(amountStolen), ' / $', ns.formatNumber(ns.getServerMaxMoney(target)))

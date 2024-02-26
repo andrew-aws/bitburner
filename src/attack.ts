@@ -1,6 +1,5 @@
 import { getAllHostServers, getAllHackableServers } from 'checkServers'
 import { isTargetUnderAttack } from 'isUnderAttack'
-import { serialize } from 'v8';
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
@@ -9,14 +8,14 @@ export async function main(ns: NS): Promise<void> {
 
 /** @param {NS} ns */
 const attackServers = async (ns: NS) => {
-  const hackMoneyFraction = 0.5;
+  const hackMoneyFraction = 0.8;
 
   while (true) {
     const hostServers = await getAllHostServers(ns);
     const targetServers = (await getAllHackableServers(ns))
       .filter((server: string) => ns.getServerMaxMoney(server) > 0)
-      .sort((a: string, b: string) => getHackability(ns, a) - getHackability(ns, b))
-      .filter((server: string) => ['silver-helix'].includes(server))
+      .sort((a: string, b: string) => ns.getServerSecurityLevel(a) - ns.getServerSecurityLevel(b))
+      // .filter((server: string) => ['silver-helix'].includes(server))
       // .slice(0, 1)
 
     for (const targetServerName of targetServers) {

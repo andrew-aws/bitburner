@@ -66,9 +66,9 @@ function canHost(ns: NS, serverName: string): boolean {
     return false;
   }
 
-  if (serverName.includes('hacknet')) { 
-    return false;
-  }
+  // if (serverName.includes('hacknet')) { 
+  //   return false;
+  // }
   
   return true;
 }

@@ -40,7 +40,7 @@ const setTasks = (ns: NS) => {
 /** @param {NS} ns */
 const decideTask = (ns: NS) => {
   const wantedPenaltyThreshold = 0.9;
-  const powerThreshold = 0;
+  const powerThreshold = 5000;
   const gangInfo = ns.gang.getGangInformation();
 
   const gangWantedPenalty = gangInfo.wantedPenalty;
@@ -54,7 +54,8 @@ const decideTask = (ns: NS) => {
     return 'Territory Warfare';
   }
 
-  return 'Strongarm Civilians';
+  // return 'Armed Robbery';
+  return 'Human Trafficking';
 
 }
 

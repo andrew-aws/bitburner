@@ -45,7 +45,7 @@ export async function main(ns: NS): Promise<void> {
       }
       
       const hashes = ns.hacknet.numHashes();
-      if (hashes > 0 && hashRate < 4) {
+      if (hashes > 0) {
         headers.push('Hashes');
         values.push(`${ns.formatNumber(hashes)}`);
       }
