@@ -4,12 +4,12 @@ import { getAllHackableServers } from '/checkServers';
 export async function main(ns: NS): Promise<void> {
     while (true) {
         await ns.sleep(10);
-        managerHacknetServers(ns);
+        // managerHacknetServers(ns);
         await spendHashes(ns);
     }
 }
 
-const managerHacknetServers = (ns: NS) => {
+export function managerHacknetServers(ns: NS): void {
     const { hacknet } = ns;
     const numHacknetNodes = hacknet.numNodes();
     const maxHacknetNodes = hacknet.maxNumNodes();
@@ -59,21 +59,15 @@ const managerHacknetServers = (ns: NS) => {
 }
 
 const spendHashes = async (ns: NS) => {
-    const moneyThreshold = 0;
-
-    if (ns.getPlayer().money > moneyThreshold) {
-        if (await reduceSecurity(ns)) {
-            return true;
-        }
-        if (await raiseMoneyCap(ns)) {
-            return true;
+    for (const callback of [reduceSecurity, raiseMoneyCap]) {
+        const moneyThreshold = 0;
+        if (ns.getPlayer().money > moneyThreshold) {
+            if (await callback(ns)) {
+                return true;
+            }
         }
 
-        if (improveStudying(ns)) {
-            return true;
-        }
     }
-
     if (sellForMoney(ns)) {
         return true;
     }
@@ -84,6 +78,7 @@ const spendHashes = async (ns: NS) => {
 }
 
 const improveStudying = (ns: NS) => {
+    return false;
     const { hacknet } = ns;
     const numHashes = hacknet.numHashes();
     const upgradeName = 'Improve Studying'
@@ -99,25 +94,31 @@ const improveStudying = (ns: NS) => {
     return false;
 }
 
+const getHackability = (ns: NS, targetName: string) => {
+    const maxMoney = ns.getServerMaxMoney(targetName);
+    const growthRate = ns.getServerGrowth(targetName);
+    const minSecurity = ns.getServerMinSecurityLevel(targetName);
+    return maxMoney * Math.sqrt(growthRate)/minSecurity;
+}
+
 const reduceSecurity = async (ns: NS) => {
     const targets = (await getAllHackableServers(ns))
-        .sort((a, b) => ns.getServerMinSecurityLevel(b) - ns.getServerMinSecurityLevel(a))
+        .sort((a, b) => getHackability(ns, b) - getHackability(ns, a))
         .filter(serverName => ns.getServerMaxMoney(serverName) > 0)
         .filter(serverName => ns.getServerMinSecurityLevel(serverName) > 1)
+
 
     const target = targets[0];
 
     const { hacknet } = ns;
     const numHashes = hacknet.numHashes();
-    if (ns.getServerMinSecurityLevel(target) > 1) {
-        const upgradeName = 'Reduce Minimum Security'
-        const upgradeCost = hacknet.hashCost(upgradeName);
+    const upgradeName = 'Reduce Minimum Security'
+    const upgradeCost = hacknet.hashCost(upgradeName);
 
-        if (numHashes > upgradeCost) {
-            hacknet.spendHashes(upgradeName, target);
-            ns.toast(`Reducing ${target} minimum security`, 'info');
-            return true;
-        }
+    if (numHashes > upgradeCost) {
+        hacknet.spendHashes(upgradeName, target);
+        ns.toast(`Reducing ${target} minimum security`, 'info');
+        return true;
     }
 
     return false;
@@ -125,7 +126,7 @@ const reduceSecurity = async (ns: NS) => {
 
 const raiseMoneyCap = async (ns: NS) => {
     const targets = (await getAllHackableServers(ns))
-        .sort((a, b) => ns.getServerMaxMoney(b) - ns.getServerMaxMoney(a))
+        .sort((a, b) => getHackability(ns, b) - getHackability(ns, a))
         .filter(serverName => ns.getServerMaxMoney(serverName) < 1e12 && ns.getServerMaxMoney(serverName) > 0)
 
 
@@ -153,8 +154,7 @@ const sellForMoney = (ns: NS) => {
     const numAfforadableUpgrades = Math.floor(numHashes / upgradeCost);
 
     const hashCapacity = hacknet.hashCapacity();
-    const hashThreshold = 1 * hashCapacity;
-
+    const hashThreshold = 0 * hashCapacity;
 
     if (hashThreshold <= numHashes && numAfforadableUpgrades > 0) {
         hacknet.spendHashes(upgradeName, '', numAfforadableUpgrades);
@@ -165,12 +165,12 @@ const sellForMoney = (ns: NS) => {
 
 }
 
-const getTotalProduction = (ns: NS) => {
-    const numHacknetServers = ns.hacknet.numNodes();
+// const getTotalProduction = (ns: NS) => {
+//     const numHacknetServers = ns.hacknet.numNodes();
 
-    const totalProduction = [...Array(numHacknetServers).keys()]
-        .map(serverNumber => ns.hacknet.getNodeStats(serverNumber).production)
-        .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+//     const totalProduction = [...Array(numHacknetServers).keys()]
+//         .map(serverNumber => ns.hacknet.getNodeStats(serverNumber).production)
+//         .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
 
-    return totalProduction;
-}
+//     return totalProduction;
+// }

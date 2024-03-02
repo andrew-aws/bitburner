@@ -3,7 +3,7 @@ import { getAccess } from 'getAccess'
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
-  const sortedServers = await getAllHackableServers(ns);
+  const sortedServers = await getAccessibleServers(ns);
   for (const serverName of sortedServers) {
     const moneyMax = ns.getServerMaxMoney(serverName);
     const minSecurity = ns.getServerMinSecurityLevel(serverName);
@@ -15,19 +15,26 @@ export async function main(ns: NS): Promise<void> {
 
 export async function getAllHackableServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
-  return results.filter(record => canHack(ns, record.host)).map(record => record.host);
+  return results.filter(record => canHack(ns, record.host)).map(record => record.host)
+  .filter((server: string) => ['n00dles','silver-helix','harakiri-sushi'].includes(server));
 }
 
 export async function getAllHostServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
-  return results.filter(record => canHost(ns, record.host)).map(record => record.host);
+  return results.filter(record => canHost(ns, record.host)).map(record => record.host).sort((a,b) => sortHosts(a,b));
 }
 
 export async function getAccessibleServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
-  return results.filter(record => ns.hasRootAccess(record.host)).map(record => record.host);
+  return results.filter(record => ns.hasRootAccess(record.host)).map(record => record.host).sort((a,b) => sortHosts(a,b));
 }
 
+const sortHosts = (a: string, b: string) => {
+  if (a.includes('hacknet') === b.includes('hacknet')){
+    return 0;
+  }
+  return a.includes('hacknet') ? 1 : -1;
+}
 
 /** @param {NS} ns */
 export async function checkServers(ns: NS): Promise<HackingRecord<typeof getAccess>[]> {
@@ -62,13 +69,13 @@ function canHost(ns: NS, serverName: string): boolean {
     return false;
   }
   
-  if (ns.getServerMaxRam(serverName) === 0 ) {
+  if (ns.getServerMaxRam(serverName) <= 0 ) {
     return false;
   }
 
-  // if (serverName.includes('hacknet')) { 
-  //   return false;
-  // }
+  if (serverName.includes('hacknet')) { 
+    return false;
+  }
   
   return true;
 }

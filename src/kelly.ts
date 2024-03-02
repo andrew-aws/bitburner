@@ -1,18 +1,17 @@
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
-  const tix = ns.stock;
+  ns.atExit(() => {
+    closeAllPositions(ns);
+  })
   while (true) {
     await kelly(ns);
-    await tix.nextUpdate();
-    // break
+    await ns.stock.nextUpdate();
   }
 }
 
 const kelly = async (ns: NS) => {
-  const tix = ns.stock;
-  ns.atExit(() => {
-    closeAllPositions(ns);
-  })
+  const {stock: tix} = ns;
+
 
   const symbols = tix.getSymbols();
 
@@ -58,7 +57,7 @@ const kelly = async (ns: NS) => {
       // Exploits the weird nature of shorts in this game
       if ((tix.getSaleGain(stockSymbol, shortPosition, 'Short')) > 1.2 * tix.getPurchaseCost(stockSymbol, shortPosition, 'Short')) {
         ns.toast(`Redistributing ${stockSymbol} short position`, `info`)
-        tix.sellShort(stockSymbol, shortPosition);
+        closePosition(ns, stockSymbol);
       }
     }
   }
@@ -179,13 +178,15 @@ const closePosition = (ns: NS, stockSymbol: string) => {
 
   if (longPosition) {
     const profit = tix.getSaleGain(stockSymbol, longPosition, 'Long') - longPosition * avgLongPrice;
+    ns.writePort(1,profit);
     const message = ns.vsprintf('Selling %s shares of %s for $%s %s', [ns.formatNumber(longPosition), stockSymbol, ns.formatNumber(Math.abs(profit)), (profit) > 0 ? 'profit' : 'loss']);
     ns.toast(message, profit > 0 ? 'success' : 'error');
     tix.sellStock(stockSymbol, longPosition)
   }
-
+  
   if (shortPosition) {
     const profit = tix.getSaleGain(stockSymbol, shortPosition, 'Short') - shortPosition * avgShortPrice;
+    ns.writePort(1,profit);
     const message = ns.vsprintf('Buying %s shares of %s for $%s %s', [ns.formatNumber(shortPosition), stockSymbol, ns.formatNumber(Math.abs(profit)), profit > 0 ? 'profit' : 'loss'])
     ns.toast(message, profit > 0 ? 'success' : 'error');
     tix.sellShort(stockSymbol, shortPosition)

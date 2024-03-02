@@ -29,7 +29,7 @@ type ServerLoadInfo = {
 /** @param {NS} ns */
 export async function getServerLoad(ns: NS): Promise<{ usedRam: number, maxRam: number, load: number }> {
   const serverLoads = await getServerLoads(ns);
-  // ns.tprint(serverLoads);
+    // ns.tprint(serverLoads);
   const usedRam = serverLoads.reduce((previousValue, currentValue) => previousValue + currentValue.usedRam, 0)
   const maxRam = serverLoads.reduce((previousValue, currentValue) => previousValue + currentValue.maxRam, 0)
   return { usedRam, maxRam, load: usedRam / maxRam }
@@ -43,7 +43,7 @@ export async function getServerLoads(ns: NS): Promise<ServerLoadInfo[]> {
 
   const serverLoads = serverNames.map(
     (serverName: string) => {
-      const maxRam = ns.getServerMaxRam(serverName);
+      const maxRam = ns.getServerMaxRam(serverName)
       const usedRam = ns.getServerUsedRam(serverName);
       const money = ns.getServerMoneyAvailable(serverName);
       const moneyMax = ns.getServerMaxMoney(serverName);

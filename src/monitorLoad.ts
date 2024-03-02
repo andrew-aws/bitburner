@@ -1,5 +1,6 @@
-import { getServerLoads } from 'serverLoad.js'
-import { progressBar } from 'progressBar.js'
+import { getServerLoads } from 'serverLoad'
+import { progressBar } from 'progressBar'
+import { getAllHackableServers } from 'checkServers';
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
@@ -8,7 +9,7 @@ export async function main(ns: NS): Promise<void> {
     ns.ui.clearTerminal();
   })
   while (true) {
-    await printLoads(ns, 55);
+    await printLoads(ns, 50);
     // break;
     await ns.sleep(100);
   }
@@ -28,12 +29,13 @@ const printLoads = async (ns: NS, size: number) => {
   ns.ui.clearTerminal()
 
   const maxServerNameLength = Math.max(...progressBars.map(info => info.serverName.length))
-  const largestServerMoney = Math.max(...progressBars.map(info => info.moneyMax))
+  // const largestServerMoney = Math.max(...progressBars.map(info => info.moneyMax))
   
 
+  const hackableServers = await getAllHackableServers(ns);
   for (const serverLoadInfo of progressBars) {
-    const { usedRam, moneyMax } = serverLoadInfo;
-    if (usedRam === 0 && moneyMax < largestServerMoney / 1000) {
+    const { usedRam, serverName, moneyMax } = serverLoadInfo;
+    if (usedRam <= 0 && (hackableServers.includes(serverName) === false || moneyMax <= 0)) {
       continue
     }
 

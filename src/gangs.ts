@@ -6,6 +6,7 @@ export async function main(ns: NS): Promise<void> {
     recruit(ns);
     setTasks(ns);
     manageEquipment(ns);
+    ascend(ns);
 
     // return 
     await ns.gang.nextUpdate();
@@ -43,14 +44,14 @@ const decideTask = (ns: NS) => {
   const powerThreshold = 5000;
   const gangInfo = ns.gang.getGangInformation();
 
-  const gangWantedPenalty = gangInfo.wantedPenalty;
-  const gangPower = gangInfo.power;
 
-  if (gangWantedPenalty < wantedPenaltyThreshold){
+  const {wantedPenalty, power, wantedLevel} = gangInfo
+
+  if (wantedPenalty < wantedPenaltyThreshold && wantedLevel > 1){
     return 'Vigilante Justice';
   }
 
-  if (gangPower < powerThreshold) {
+  if (power < powerThreshold) {
     return 'Territory Warfare';
   }
 
@@ -80,6 +81,29 @@ const manageEquipment = (ns: NS) => {
         gang.purchaseEquipment(memberName, equipmentName)
       }
     }
+  }
+}
+
+const ascend = (ns: NS) => {
+  const {gang} = ns;
+
+  const memberNames = gang.getMemberNames();
+
+  const ascensionThreshold = 1.5;
+
+  for (const memberName of memberNames){
+    const ascensionResult = gang.getAscensionResult(memberName);
+    if (ascensionResult === undefined) {
+      return;
+    }
+    const {hack, def, dex, str, cha} = ascensionResult;
+    // ascensionResult.
+
+    if (Math.min(hack, str, def, dex, cha) > ascensionThreshold) {
+      ns.toast(`Ascending ${memberName}`)
+      gang.ascendMember(memberName);
+    }
+
   }
 }
 

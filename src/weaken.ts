@@ -1,5 +1,5 @@
 /** @param {NS} ns */
-export async function main(ns: NS) {
+export async function main(ns: NS): Promise<number> {
   if (ns.args.length < 1) {
     return 0
   }

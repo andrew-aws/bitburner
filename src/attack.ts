@@ -8,15 +8,15 @@ export async function main(ns: NS): Promise<void> {
 
 /** @param {NS} ns */
 const attackServers = async (ns: NS) => {
-  const hackMoneyFraction = 0.8;
+  const hackMoneyFraction = 0.2;
 
   while (true) {
     const hostServers = await getAllHostServers(ns);
     const targetServers = (await getAllHackableServers(ns))
       .filter((server: string) => ns.getServerMaxMoney(server) > 0)
       .sort((a: string, b: string) => ns.getServerSecurityLevel(a) - ns.getServerSecurityLevel(b))
-      // .filter((server: string) => ['silver-helix'].includes(server))
-      // .slice(0, 1)
+      // .filter((server: string) => ['n00dles','foodnstuff','sigma-cosmetics','harakiri-sushi'].includes(server))
+      // .slice(0, 2)
 
     for (const targetServerName of targetServers) {
       // if (['iron-gym'].includes(targetServerName) === false) {
@@ -62,14 +62,14 @@ const attackServers = async (ns: NS) => {
   }
 }
 
-/** @param {NS} ns */
-const getHackability = (ns: NS, serverName: string) => {
-  const serverMoney = ns.getServerMaxMoney(serverName);
-  const serverSecurity = ns.getServerMinSecurityLevel(serverName);
-  const serverGrowthRate = ns.getServerGrowth(serverName);
+// /** @param {NS} ns */
+// const getHackability = (ns: NS, serverName: string) => {
+//   const serverMoney = ns.getServerMaxMoney(serverName);
+//   const serverSecurity = ns.getServerMinSecurityLevel(serverName);
+//   const serverGrowthRate = ns.getServerGrowth(serverName);
 
-  return serverMoney * serverGrowthRate / serverSecurity;
-}
+//   return serverMoney * serverGrowthRate / serverSecurity;
+// }
 
 /** @param {NS} ns */
 const deployFromHosts = (ns: NS, attackInfo: { numThreads: number, hostServers: string[], targetServerName: string, scriptName: string }) => {
