@@ -1,4 +1,4 @@
-import {getAllHackableServers} from 'checkServers.js'
+import {getAllHostServers} from 'checkServers.js'
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
@@ -14,7 +14,7 @@ export async function main(ns: NS): Promise<void> {
 
 /** @param {NS} ns */
 export async function isTargetUnderAttack(ns: NS, target: string): Promise<boolean> {
-  const servers = await getAllHackableServers(ns)
+  const servers = await getAllHostServers(ns)
  
   const targetAttacked = servers.map(
     server => {

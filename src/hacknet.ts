@@ -1,5 +1,5 @@
 import { NS } from '@ns'
-import { getAllHackableServers } from '/checkServers';
+import { getAllHackableServers, getHackability } from '/checkServers';
 
 export async function main(ns: NS): Promise<void> {
     while (true) {
@@ -94,17 +94,8 @@ const improveStudying = (ns: NS) => {
     return false;
 }
 
-const getHackability = (ns: NS, targetName: string) => {
-    const maxMoney = ns.getServerMaxMoney(targetName);
-    const growthRate = ns.getServerGrowth(targetName);
-    const minSecurity = ns.getServerMinSecurityLevel(targetName);
-    return maxMoney * Math.sqrt(growthRate)/minSecurity;
-}
-
 const reduceSecurity = async (ns: NS) => {
     const targets = (await getAllHackableServers(ns))
-        .sort((a, b) => getHackability(ns, b) - getHackability(ns, a))
-        .filter(serverName => ns.getServerMaxMoney(serverName) > 0)
         .filter(serverName => ns.getServerMinSecurityLevel(serverName) > 1)
 
 
@@ -126,7 +117,6 @@ const reduceSecurity = async (ns: NS) => {
 
 const raiseMoneyCap = async (ns: NS) => {
     const targets = (await getAllHackableServers(ns))
-        .sort((a, b) => getHackability(ns, b) - getHackability(ns, a))
         .filter(serverName => ns.getServerMaxMoney(serverName) < 1e12 && ns.getServerMaxMoney(serverName) > 0)
 
 
@@ -154,7 +144,7 @@ const sellForMoney = (ns: NS) => {
     const numAfforadableUpgrades = Math.floor(numHashes / upgradeCost);
 
     const hashCapacity = hacknet.hashCapacity();
-    const hashThreshold = 0 * hashCapacity;
+    const hashThreshold = 1 * hashCapacity;
 
     if (hashThreshold <= numHashes && numAfforadableUpgrades > 0) {
         hacknet.spendHashes(upgradeName, '', numAfforadableUpgrades);

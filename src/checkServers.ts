@@ -3,20 +3,25 @@ import { getAccess } from 'getAccess'
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
-  const sortedServers = await getAccessibleServers(ns);
+  const sortedServers = await getAllHackableServers(ns);
   for (const serverName of sortedServers) {
-    const moneyMax = ns.getServerMaxMoney(serverName);
-    const minSecurity = ns.getServerMinSecurityLevel(serverName);
-    const growthRate = ns.getServerGrowth(serverName);
-    const hackability = moneyMax * growthRate/ minSecurity;
+    const hackability = getHackability(ns, serverName);
     ns.tprint(`${serverName} ${ns.formatNumber(hackability)}`)
   }
 }
 
+export function getHackability(ns: NS, serverName: string): number {
+  const moneyMax = ns.getServerMaxMoney(serverName);
+  const minSecurity = ns.getServerMinSecurityLevel(serverName);
+  const growthRate = ns.getServerGrowth(serverName);
+  const hackability = moneyMax * Math.sqrt(growthRate)/minSecurity;
+  return hackability;
+}
+
 export async function getAllHackableServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
-  return results.filter(record => canHack(ns, record.host)).map(record => record.host)
-  .filter((server: string) => ['n00dles','silver-helix','harakiri-sushi'].includes(server));
+  return results.filter(record => canHack(ns, record.host)).map(record => record.host).sort((a, b) => getHackability(ns, b) - getHackability(ns, a))
+  // .filter((server: string) => ['n00dles','silver-helix','harakiri-sushi','phantasy'].includes(server));
 }
 
 export async function getAllHostServers(ns: NS): Promise<string[]> {
@@ -54,6 +59,10 @@ export async function checkServers(ns: NS): Promise<HackingRecord<typeof getAcce
 
 function canHack(ns: NS, serverName: string): boolean {
   if (!ns.hasRootAccess(serverName)) {
+    return false;
+  }
+
+  if (ns.getPlayer().skills.hacking < ns.getServerRequiredHackingLevel(serverName)){
     return false;
   }
   const hackChance = ns.hackAnalyzeChance(serverName);

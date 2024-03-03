@@ -8,15 +8,13 @@ export async function main(ns: NS): Promise<void> {
 
 /** @param {NS} ns */
 const attackServers = async (ns: NS) => {
-  const hackMoneyFraction = 0.2;
+  const hackMoneyFraction = 0.1;
 
   while (true) {
+    await ns.sleep(1000);
     const hostServers = await getAllHostServers(ns);
     const targetServers = (await getAllHackableServers(ns))
-      .filter((server: string) => ns.getServerMaxMoney(server) > 0)
-      .sort((a: string, b: string) => ns.getServerSecurityLevel(a) - ns.getServerSecurityLevel(b))
-      // .filter((server: string) => ['n00dles','foodnstuff','sigma-cosmetics','harakiri-sushi'].includes(server))
-      // .slice(0, 2)
+    .slice(0, 1)
 
     for (const targetServerName of targetServers) {
       // if (['iron-gym'].includes(targetServerName) === false) {
@@ -35,7 +33,7 @@ const attackServers = async (ns: NS) => {
       const targetMinSecurity = ns.getServerMinSecurityLevel(targetServerName);
       const targetMoney = ns.getServerMoneyAvailable(targetServerName);
       const targetMoneyMax = ns.getServerMaxMoney(targetServerName);
-      const numHackThreads = Math.ceil(ns.hackAnalyzeThreads(targetServerName, hackMoneyFraction * targetMoney));
+      const numHackThreads = Math.ceil(ns.hackAnalyzeThreads(targetServerName,hackMoneyFraction * targetMoney));
 
       const numGrowthThreads = Math.ceil(ns.growthAnalyze(targetServerName, Math.ceil(targetMoneyMax / (targetMoney + 1))));
 
@@ -58,7 +56,6 @@ const attackServers = async (ns: NS) => {
         deployFromHosts(ns, { targetServerName, hostServers, scriptName: 'weaken.js', numThreads: numWeakeningThreadsFromHack });
       }
     }
-    await ns.sleep(1000);
   }
 }
 
