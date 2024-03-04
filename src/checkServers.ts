@@ -14,13 +14,15 @@ export function getHackability(ns: NS, serverName: string): number {
   const moneyMax = ns.getServerMaxMoney(serverName);
   const minSecurity = ns.getServerMinSecurityLevel(serverName);
   const growthRate = ns.getServerGrowth(serverName);
-  const hackability = moneyMax * Math.sqrt(growthRate)/minSecurity;
+  const minHackLevel = ns.getServerMinSecurityLevel(serverName)
+  const hackability = moneyMax * Math.sqrt(growthRate)/(minSecurity * minHackLevel);
   return hackability;
 }
 
 export async function getAllHackableServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
   return results.filter(record => canHack(ns, record.host)).map(record => record.host).sort((a, b) => getHackability(ns, b) - getHackability(ns, a))
+  // .slice(0,3)
   // .filter((server: string) => ['n00dles','silver-helix','harakiri-sushi','phantasy'].includes(server));
 }
 
@@ -61,14 +63,19 @@ function canHack(ns: NS, serverName: string): boolean {
   if (!ns.hasRootAccess(serverName)) {
     return false;
   }
-
+  
+  if (ns.getServerMaxMoney(serverName) <= 0){
+    return false;
+  }
+  
   if (ns.getPlayer().skills.hacking < ns.getServerRequiredHackingLevel(serverName)){
     return false;
   }
-  const hackChance = ns.hackAnalyzeChance(serverName);
-  if (hackChance <= 0) {
-    return false;
-  }
+  // const hackChance = ns.hackAnalyzeChance(serverName);
+  // ns.tprint(hackChance)
+  // if (hackChance <= 0) {
+  //   return false;
+  // }
   
   return true;
 }

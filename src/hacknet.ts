@@ -59,7 +59,7 @@ export function managerHacknetServers(ns: NS): void {
 }
 
 const spendHashes = async (ns: NS) => {
-    for (const callback of [reduceSecurity, raiseMoneyCap]) {
+    for (const callback of [reduceSecurity, raiseMoneyCap, improveStudying]) {
         const moneyThreshold = 0;
         if (ns.getPlayer().money > moneyThreshold) {
             if (await callback(ns)) {
@@ -96,7 +96,7 @@ const improveStudying = (ns: NS) => {
 
 const reduceSecurity = async (ns: NS) => {
     const targets = (await getAllHackableServers(ns))
-        .filter(serverName => ns.getServerMinSecurityLevel(serverName) > 1)
+        .filter(serverName => ns.getServerMinSecurityLevel(serverName) > 1.1)
 
 
     const target = targets[0];

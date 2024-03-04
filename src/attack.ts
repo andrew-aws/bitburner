@@ -8,13 +8,14 @@ export async function main(ns: NS): Promise<void> {
 
 /** @param {NS} ns */
 const attackServers = async (ns: NS) => {
-  const hackMoneyFraction = 0.1;
+  const hackMoneyFraction = 0.4;
 
   while (true) {
     await ns.sleep(1000);
     const hostServers = await getAllHostServers(ns);
     const targetServers = (await getAllHackableServers(ns))
-    .slice(0, 1)
+    // .sort((a,b) => ns.getServerMinSecurityLevel(a) - ns.getServerMinSecurityLevel(b))
+    // .slice(0, 4)
 
     for (const targetServerName of targetServers) {
       // if (['iron-gym'].includes(targetServerName) === false) {
@@ -42,9 +43,9 @@ const attackServers = async (ns: NS) => {
 
       const targetSecurityDecrease = targetSecurity - targetMinSecurity;
       const weakeningPower = ns.weakenAnalyze(1);
-      const numWeakeningThreads = Math.floor(targetSecurityDecrease / weakeningPower);
-      const numWeakeningThreadsFromGrowth = Math.floor(growthImpact / weakeningPower);
-      const numWeakeningThreadsFromHack = Math.floor(hackImpact / weakeningPower);
+      const numWeakeningThreads = Math.ceil(targetSecurityDecrease / weakeningPower);
+      const numWeakeningThreadsFromGrowth = Math.ceil(growthImpact / weakeningPower);
+      const numWeakeningThreadsFromHack = Math.ceil(hackImpact / weakeningPower);
 
       if (numWeakeningThreads + numGrowthThreads > 0) {
         deployFromHosts(ns, { targetServerName, hostServers, scriptName: 'weaken.js', numThreads: numWeakeningThreads });
@@ -58,6 +59,8 @@ const attackServers = async (ns: NS) => {
     }
   }
 }
+
+
 
 // /** @param {NS} ns */
 // const getHackability = (ns: NS, serverName: string) => {

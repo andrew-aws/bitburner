@@ -1,6 +1,5 @@
 import { getServerLoads } from 'serverLoad'
 import { progressBar } from 'progressBar'
-import { getAllHackableServers } from 'checkServers';
 
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
@@ -11,7 +10,7 @@ export async function main(ns: NS): Promise<void> {
   while (true) {
     await printLoads(ns, 50);
     // break;
-    await ns.sleep(100);
+    await ns.sleep(1000);
   }
 }
 
@@ -32,10 +31,9 @@ const printLoads = async (ns: NS, size: number) => {
   // const largestServerMoney = Math.max(...progressBars.map(info => info.moneyMax))
   
 
-  const hackableServers = await getAllHackableServers(ns);
   for (const serverLoadInfo of progressBars) {
-    const { usedRam, serverName, moneyMax } = serverLoadInfo;
-    if (usedRam <= 0 && (hackableServers.includes(serverName) === false || moneyMax <= 0)) {
+    const { usedRam } = serverLoadInfo;
+    if (usedRam <= 0) {
       continue
     }
 
