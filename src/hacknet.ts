@@ -144,7 +144,7 @@ const sellForMoney = (ns: NS) => {
     const numAfforadableUpgrades = Math.floor(numHashes / upgradeCost);
 
     const hashCapacity = hacknet.hashCapacity();
-    const hashThreshold = 1 * hashCapacity;
+    const hashThreshold = 0 * hashCapacity;
 
     if (hashThreshold <= numHashes && numAfforadableUpgrades > 0) {
         hacknet.spendHashes(upgradeName, '', numAfforadableUpgrades);

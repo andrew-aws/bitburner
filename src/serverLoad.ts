@@ -28,7 +28,7 @@ type ServerLoadInfo = {
 
 /** @param {NS} ns */
 export async function getServerLoad(ns: NS): Promise<{ usedRam: number, maxRam: number, load: number }> {
-  const serverLoads = await getServerLoads(ns);
+  const serverLoads = (await getServerLoads(ns)).filter(element => element.serverName !== 'home');
     // ns.tprint(serverLoads);
   const usedRam = serverLoads.reduce((previousValue, currentValue) => previousValue + currentValue.usedRam, 0)
   const maxRam = serverLoads.reduce((previousValue, currentValue) => previousValue + currentValue.maxRam, 0)

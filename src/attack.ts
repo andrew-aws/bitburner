@@ -8,7 +8,7 @@ export async function main(ns: NS): Promise<void> {
 
 /** @param {NS} ns */
 const attackServers = async (ns: NS) => {
-  const hackMoneyFraction = 0.4;
+  const hackMoneyFraction = 0.1;
 
   while (true) {
     await ns.sleep(1000);
@@ -34,7 +34,8 @@ const attackServers = async (ns: NS) => {
       const targetMinSecurity = ns.getServerMinSecurityLevel(targetServerName);
       const targetMoney = ns.getServerMoneyAvailable(targetServerName);
       const targetMoneyMax = ns.getServerMaxMoney(targetServerName);
-      const numHackThreads = Math.ceil(ns.hackAnalyzeThreads(targetServerName,hackMoneyFraction * targetMoney));
+      const hackChance = ns.hackAnalyzeChance(targetServerName);
+      const numHackThreads = hackChance > 0 ? Math.ceil(ns.hackAnalyzeThreads(targetServerName,hackMoneyFraction * targetMoney)) : 0;
 
       const numGrowthThreads = Math.ceil(ns.growthAnalyze(targetServerName, Math.ceil(targetMoneyMax / (targetMoney + 1))));
 

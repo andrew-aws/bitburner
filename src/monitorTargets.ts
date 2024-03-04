@@ -18,10 +18,11 @@ const printTargets = async (ns: NS) => {
         const server = ns.getServer(target);
 
         const { moneyMax, moneyAvailable, requiredHackingSkill, serverGrowth, hackDifficulty, minDifficulty } = server;
-        if (moneyMax === undefined || moneyAvailable === undefined || hackDifficulty === undefined || minDifficulty === undefined || serverGrowth === undefined){
+        const hackChance = ns.hackAnalyzeChance(target);
+        if (moneyMax === undefined || moneyAvailable === undefined || hackDifficulty === undefined || minDifficulty === undefined || serverGrowth === undefined || requiredHackingSkill === undefined){
             continue;
         }
 
-        ns.tprintf('%s', `${target.padEnd(20)}: $${ns.formatNumber(moneyAvailable).padStart(9)} / $${ns.formatNumber(moneyMax).padEnd(9)} || ${ns.formatNumber(hackDifficulty).padStart(7)} / ${ns.formatNumber(minDifficulty).padEnd(7)} || ${ns.formatNumber(serverGrowth).padEnd(6)} || ${requiredHackingSkill}`)
+        ns.tprintf('%s', `${target.padEnd(20)}: $${ns.formatNumber(moneyAvailable).padStart(9)} / $${ns.formatNumber(moneyMax).padEnd(9)} || ${ns.formatNumber(hackDifficulty).padStart(7)} / ${ns.formatNumber(minDifficulty).padEnd(7)} || ${ns.formatNumber(serverGrowth).padEnd(6)} || ${ns.formatNumber(requiredHackingSkill,0).padEnd(3)} || ${ns.formatPercent(hackChance)}`)
     }
 }

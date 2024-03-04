@@ -50,11 +50,11 @@ export async function main(ns: NS): Promise<void> {
         values.push(`${ns.formatNumber(hashes)}`);
       }
       
-      const karma = ns.heart.break();
-      if (karma) {
-        headers.push('Karma');
-        values.push(`${ns.formatNumber(karma)}`);
-      }
+      // const karma = ns.heart.break();
+      // if (karma) {
+      //   headers.push('Karma');
+      //   values.push(`${ns.formatNumber(karma)}`);
+      // }
 
 
       // Now drop it into the placeholder elements
