@@ -22,7 +22,7 @@ export function getHackability(ns: NS, serverName: string): number {
 export async function getAllHackableServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
   return results.filter(record => canHack(ns, record.host)).map(record => record.host).sort((a, b) => getHackability(ns, b) - getHackability(ns, a))
-  // .slice(0,3)
+  .slice(0,1)
   // .filter((server: string) => ['n00dles','silver-helix','harakiri-sushi','phantasy'].includes(server));
 }
 

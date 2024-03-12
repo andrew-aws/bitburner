@@ -1,5 +1,5 @@
 import { NS } from '@ns'
-import { getAllHackableServers, getHackability } from '/checkServers';
+import { getAllHackableServers } from '/checkServers';
 
 export async function main(ns: NS): Promise<void> {
     while (true) {
@@ -59,7 +59,7 @@ export function managerHacknetServers(ns: NS): void {
 }
 
 const spendHashes = async (ns: NS) => {
-    for (const callback of [reduceSecurity, raiseMoneyCap, improveStudying]) {
+    for (const callback of [reduceSecurity, raiseMoneyCap, improveStudying, improveGymTraining]) {
         const moneyThreshold = 0;
         if (ns.getPlayer().money > moneyThreshold) {
             if (await callback(ns)) {
@@ -94,32 +94,55 @@ const improveStudying = (ns: NS) => {
     return false;
 }
 
+const improveGymTraining = (ns: NS) => {
+    return false;
+    const { hacknet } = ns;
+    const numHashes = hacknet.numHashes();
+    const upgradeName = 'Improve Gym Training'
+    const upgradeCost = hacknet.hashCost(upgradeName);
+
+    if (numHashes > upgradeCost) {
+        hacknet.spendHashes(upgradeName);
+        ns.toast(`Improving Gym Training`, 'info');
+        return true;
+    }
+
+
+    return false;
+}
+
 const reduceSecurity = async (ns: NS) => {
     const targets = (await getAllHackableServers(ns))
         .filter(serverName => ns.getServerMinSecurityLevel(serverName) > 1.1)
 
 
+    if (targets.length <= 0) {
+        return false;
+    }
     const target = targets[0];
-
+    
     const { hacknet } = ns;
     const numHashes = hacknet.numHashes();
     const upgradeName = 'Reduce Minimum Security'
     const upgradeCost = hacknet.hashCost(upgradeName);
-
+    
     if (numHashes > upgradeCost) {
         hacknet.spendHashes(upgradeName, target);
         ns.toast(`Reducing ${target} minimum security`, 'info');
         return true;
     }
-
+    
     return false;
 }
 
 const raiseMoneyCap = async (ns: NS) => {
     const targets = (await getAllHackableServers(ns))
-        .filter(serverName => ns.getServerMaxMoney(serverName) < 1e12 && ns.getServerMaxMoney(serverName) > 0)
-
-
+    .filter(serverName => ns.getServerMaxMoney(serverName) < 1e13 && ns.getServerMaxMoney(serverName) > 0)
+    
+    
+    if (targets.length <= 0) {
+        return false;
+    }
     const target = targets[0];
 
     const { hacknet } = ns;

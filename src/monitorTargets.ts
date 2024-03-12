@@ -2,9 +2,14 @@ import { NS } from '@ns'
 import { getAllHackableServers } from '/checkServers';
 
 export async function main(ns: NS): Promise<void> {
+
+    ns.atExit(() => {
+        ns.ui.clearTerminal();
+    })
+
     while(true){
-        await ns.sleep(1000)
         await printTargets(ns);
+        await ns.sleep(1000);
     }
 }
 
@@ -23,6 +28,6 @@ const printTargets = async (ns: NS) => {
             continue;
         }
 
-        ns.tprintf('%s', `${target.padEnd(20)}: $${ns.formatNumber(moneyAvailable).padStart(9)} / $${ns.formatNumber(moneyMax).padEnd(9)} || ${ns.formatNumber(hackDifficulty).padStart(7)} / ${ns.formatNumber(minDifficulty).padEnd(7)} || ${ns.formatNumber(serverGrowth).padEnd(6)} || ${ns.formatNumber(requiredHackingSkill,0).padEnd(3)} || ${ns.formatPercent(hackChance)}`)
+        ns.tprintf('%s', `${target.padEnd(20)}: $${ns.formatNumber(moneyAvailable).padStart(9)} / $${ns.formatNumber(moneyMax).padEnd(9)} || ${ns.formatNumber(hackDifficulty).padStart(7)} / ${ns.formatNumber(minDifficulty).padEnd(7)} || ${ns.formatNumber(serverGrowth).padEnd(6)} || ${String(requiredHackingSkill).padEnd(4)} || ${ns.formatPercent(hackChance)}`)
     }
 }

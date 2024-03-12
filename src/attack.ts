@@ -8,7 +8,7 @@ export async function main(ns: NS): Promise<void> {
 
 /** @param {NS} ns */
 const attackServers = async (ns: NS) => {
-  const hackMoneyFraction = 0.1;
+  const hackMoneyFraction = 0.5;
 
   while (true) {
     await ns.sleep(1000);

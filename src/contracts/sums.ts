@@ -1,8 +1,8 @@
 import { NS } from '@ns'
 
 export async function main(ns: NS): Promise<void> {
-    const numberSet = [2, 3, 4, 5, 7, 10, 11, 12];
-    const targetNumber = 25
+    const numberSet = [4,5,7];
+    const targetNumber = 100
 
     const results: number[][] = []
 
@@ -23,5 +23,5 @@ export async function main(ns: NS): Promise<void> {
     }
 
     sums(ns);
-    ns.tprint(results.length)
+    ns.tprint(results)
 }

@@ -3,7 +3,7 @@ import { getServerLoad } from 'serverLoad.js'
 /** @param {NS} ns */
 export async function main(ns: NS): Promise<void> {
   const ram = 8;
-  const serverLoadThreshold = 0.95;
+  const serverLoadThreshold = 0.9;
 
   while (true) {
     await ns.sleep(100)
