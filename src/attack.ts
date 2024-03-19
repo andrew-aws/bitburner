@@ -12,7 +12,7 @@ const attackServers = async (ns: NS) => {
 
   while (true) {
     await ns.sleep(1000);
-    const hostServers = await getAllHostServers(ns);
+    // const hostServers = await getAllHostServers(ns);
     const targetServers = (await getAllHackableServers(ns))
     // .sort((a,b) => ns.getServerMinSecurityLevel(a) - ns.getServerMinSecurityLevel(b))
     // .slice(0, 4)
@@ -30,14 +30,26 @@ const attackServers = async (ns: NS) => {
         continue
       }
 
-      const targetSecurity = ns.getServerSecurityLevel(targetServerName);
-      const targetMinSecurity = ns.getServerMinSecurityLevel(targetServerName);
-      const targetMoney = ns.getServerMoneyAvailable(targetServerName);
-      const targetMoneyMax = ns.getServerMaxMoney(targetServerName);
-      const hackChance = ns.hackAnalyzeChance(targetServerName);
-      const numHackThreads = hackChance > 0 ? Math.ceil(ns.hackAnalyzeThreads(targetServerName,hackMoneyFraction * targetMoney)) : 0;
+      const server = ns.getServer(targetServerName);
 
-      const numGrowthThreads = Math.ceil(ns.growthAnalyze(targetServerName, Math.ceil(targetMoneyMax / (targetMoney + 1))));
+      const {
+        hackDifficulty: targetSecurity,
+        minDifficulty: targetMinSecurity,
+        moneyAvailable: targetMoney,
+        moneyMax: targetMoneyMax,
+      } = server
+
+      if (targetSecurity === undefined || targetMoneyMax === undefined || targetMoney === undefined || targetMinSecurity === undefined) {
+        continue;
+      }
+
+      // const numHackThreads = Math.ceil(ns.hackAnalyzeThreads(targetServerName, hackMoneyFraction * targetMoney));
+      const hackPower = ns.formulas.hacking.hackPercent(server,ns.getPlayer());
+
+      const numHackThreads = Math.ceil(hackMoneyFraction / hackPower);
+
+      // const numGrowthThreads = Math.ceil(ns.growthAnalyze(targetServerName, Math.ceil(targetMoneyMax / (targetMoney + 1))));
+      const numGrowthThreads = ns.formulas.hacking.growThreads(server, ns.getPlayer(),targetMoneyMax)
 
       const growthImpact = ns.growthAnalyzeSecurity(numGrowthThreads, targetServerName);
       const hackImpact = ns.hackAnalyzeSecurity(numHackThreads, targetServerName);
@@ -47,15 +59,19 @@ const attackServers = async (ns: NS) => {
       const numWeakeningThreads = Math.ceil(targetSecurityDecrease / weakeningPower);
       const numWeakeningThreadsFromGrowth = Math.ceil(growthImpact / weakeningPower);
       const numWeakeningThreadsFromHack = Math.ceil(hackImpact / weakeningPower);
-
+      // if (targetServerName !== 'n00dles'){
+      //   continue;
+      // }
       if (numWeakeningThreads + numGrowthThreads > 0) {
-        deployFromHosts(ns, { targetServerName, hostServers, scriptName: 'weaken.js', numThreads: numWeakeningThreads });
-        deployFromHosts(ns, { targetServerName, hostServers, scriptName: 'grow.js', numThreads: numGrowthThreads });
-        deployFromHosts(ns, { targetServerName, hostServers, scriptName: 'weaken.js', numThreads: numWeakeningThreadsFromGrowth });
+        // ns.tprint(`${targetServerName.padStart(15)}: Weaken threads: ${numWeakeningThreads} Grow Threads: ${numGrowthThreads} Weaken Threads: ${numWeakeningThreadsFromGrowth}`)
+        await deployFromHosts(ns, { targetServerName, scriptName: 'weaken.js', numThreads: numWeakeningThreads });
+        await deployFromHosts(ns, { targetServerName, scriptName: 'grow.js', numThreads: numGrowthThreads });
+        await deployFromHosts(ns, { targetServerName, scriptName: 'weaken.js', numThreads: numWeakeningThreadsFromGrowth });
       }
       else if (numHackThreads > 0) {
-        deployFromHosts(ns, { targetServerName, hostServers, scriptName: 'hack.js', numThreads: numHackThreads });
-        deployFromHosts(ns, { targetServerName, hostServers, scriptName: 'weaken.js', numThreads: numWeakeningThreadsFromHack });
+        // ns.tprint(`${targetServerName.padStart(15)}: Hack threads: ${numHackThreads} Weaken Threads: ${numWeakeningThreadsFromHack}`)
+        await deployFromHosts(ns, { targetServerName, scriptName: 'hack.js', numThreads: numHackThreads });
+        await deployFromHosts(ns, { targetServerName, scriptName: 'weaken.js', numThreads: numWeakeningThreadsFromHack });
       }
     }
   }
@@ -73,8 +89,9 @@ const attackServers = async (ns: NS) => {
 // }
 
 /** @param {NS} ns */
-const deployFromHosts = (ns: NS, attackInfo: { numThreads: number, hostServers: string[], targetServerName: string, scriptName: string }) => {
-  const { hostServers } = attackInfo;
+const deployFromHosts = async (ns: NS, attackInfo: { numThreads: number, targetServerName: string, scriptName: string }) => {
+  await ns.sleep(10)
+  const hostServers = await getAllHostServers(ns)
   let { numThreads } = attackInfo;
   if (numThreads === 0) {
     return true;
@@ -92,11 +109,12 @@ const deployFromHosts = (ns: NS, attackInfo: { numThreads: number, hostServers: 
 /** @param {NS} ns */
 const attackTarget = (ns: NS, attackInfo: { targetServerName: string, hostServerName: string, numThreads: number, scriptName: string }) => {
   const { targetServerName, hostServerName, numThreads, scriptName } = attackInfo;
-  if (hostServerName !== 'home') {
-    ns.scp(scriptName, hostServerName, 'home');
+  const homeName = 'home';
+  if (hostServerName !== homeName) {
+    ns.scp(scriptName, hostServerName, homeName);
   }
   const scriptRamCost = ns.getScriptRam(scriptName, hostServerName);
-  const maxRam = Math.max(ns.getServerMaxRam(hostServerName) - (hostServerName === 'home' ? 64 : 0), 0);
+  const maxRam = Math.max(ns.getServerMaxRam(hostServerName) - (hostServerName === homeName ? 64 : 0), 0);
   const freeRam = Math.max(maxRam - ns.getServerUsedRam(hostServerName), 0);
   const possibleThreads = Math.floor(freeRam / scriptRamCost);
 
@@ -132,15 +150,15 @@ const getStockInfluence = (ns: NS, attackInfo: { targetServerName: string, scrip
     return false;
   }
 
-  const forecast = ns.stock.getForecast(stockSymbol);
+  // const forecast = ns.stock.getForecast(stockSymbol);
 
   if (scriptName === 'hack.js') {
-    return forecast < 0.5;
+    return true;
   }
 
-  if (scriptName === 'grow.js') {
-    return forecast > 0.5;
-  }
+  // if (scriptName === 'grow.js') {
+  //   return forecast > 0.5;
+  // }
 
   return false;
 }

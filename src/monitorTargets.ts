@@ -1,5 +1,5 @@
 import { NS } from '@ns'
-import { getAllHackableServers } from '/checkServers';
+import { getAllHackableServers, getHackability } from '/checkServers';
 
 export async function main(ns: NS): Promise<void> {
 
@@ -21,13 +21,16 @@ const printTargets = async (ns: NS) => {
     for (const target of targets) {
 
         const server = ns.getServer(target);
+        const player = ns.getPlayer();
+
+        const hackability = getHackability(ns, target);
 
         const { moneyMax, moneyAvailable, requiredHackingSkill, serverGrowth, hackDifficulty, minDifficulty } = server;
-        const hackChance = ns.hackAnalyzeChance(target);
+        const hackChance = ns.formulas.hacking.hackChance({...server, hackDifficulty: server.minDifficulty}, player)
         if (moneyMax === undefined || moneyAvailable === undefined || hackDifficulty === undefined || minDifficulty === undefined || serverGrowth === undefined || requiredHackingSkill === undefined){
             continue;
         }
 
-        ns.tprintf('%s', `${target.padEnd(20)}: $${ns.formatNumber(moneyAvailable).padStart(9)} / $${ns.formatNumber(moneyMax).padEnd(9)} || ${ns.formatNumber(hackDifficulty).padStart(7)} / ${ns.formatNumber(minDifficulty).padEnd(7)} || ${ns.formatNumber(serverGrowth).padEnd(6)} || ${String(requiredHackingSkill).padEnd(4)} || ${ns.formatPercent(hackChance)}`)
+        ns.tprintf('%s', `${target.padEnd(20)}: $${ns.formatNumber(moneyAvailable).padStart(9)} / $${ns.formatNumber(moneyMax).padEnd(9)} || ${ns.formatNumber(hackDifficulty).padStart(7)} / ${ns.formatNumber(minDifficulty).padEnd(7)} || ${ns.formatNumber(serverGrowth).padEnd(6)} || ${String(requiredHackingSkill).padEnd(4)} || ${ns.formatPercent(hackChance).padEnd(7)} || ${ns.formatNumber(hackability)}`)
     }
 }
