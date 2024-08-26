@@ -78,7 +78,7 @@ const spendHashes = async (ns: NS) => {
 }
 
 const improveStudying = (ns: NS) => {
-    return false;
+    // return false;
     const { hacknet } = ns;
     const numHashes = hacknet.numHashes();
     const upgradeName = 'Improve Studying'
@@ -95,7 +95,7 @@ const improveStudying = (ns: NS) => {
 }
 
 const improveGymTraining = (ns: NS) => {
-    return false;
+    // return false;
     const { hacknet } = ns;
     const numHashes = hacknet.numHashes();
     const upgradeName = 'Improve Gym Training'
@@ -167,7 +167,7 @@ const sellForMoney = (ns: NS) => {
     const numAfforadableUpgrades = Math.floor(numHashes / upgradeCost);
 
     const hashCapacity = hacknet.hashCapacity();
-    const hashThreshold = 1 * hashCapacity;
+    const hashThreshold = 0 * hashCapacity;
 
     if (hashThreshold <= numHashes && numAfforadableUpgrades > 0) {
         hacknet.spendHashes(upgradeName, '', numAfforadableUpgrades);

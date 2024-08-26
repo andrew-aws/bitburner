@@ -10,7 +10,7 @@ export async function main(ns: NS): Promise<void> {
   while (true) {
     await printLoads(ns, 50);
     // break;
-    await ns.sleep(1000);
+    await ns.sleep(250);
   }
 }
 

@@ -1,5 +1,6 @@
 import { getPortfolioValue } from 'getPortfolioValue'
 import { getServerLoad } from 'serverLoad'
+import { getAllHostServers } from '/checkServers';
 
 /** @param {NS} ns **/
 export async function main(ns: NS): Promise<void> {
@@ -11,7 +12,7 @@ export async function main(ns: NS): Promise<void> {
     return;
   }
   while (true) {
-    await ns.sleep(100);
+    await ns.sleep(1000);
     try {
       const headers = [];
       const values = [];
@@ -49,6 +50,13 @@ export async function main(ns: NS): Promise<void> {
         headers.push('Hashes');
         values.push(`${ns.formatNumber(hashes)}`);
       }
+
+      // const hostServers = await getAllHostServers(ns);
+      // const numScripts = hostServers.reduce((accumulator, currentValue) => accumulator + ns.ps(currentValue).length,0)
+      // if (numScripts > 0) {
+      //   headers.push('Scripts');
+      //   values.push(`${ns.formatNumber(numScripts)}`);
+      // }
       
       // const karma = ns.heart.break();
       // if (karma) {

@@ -5,8 +5,7 @@ import { getAccess } from 'getAccess'
 export async function main(ns: NS): Promise<void> {
   const sortedServers = await getAllHostServers(ns);
   for (const serverName of sortedServers) {
-    const freeRam = getFreeMemory(ns,serverName)
-    ns.tprint(`${serverName} ${ns.formatRam(freeRam)}`)
+    ns.tprint(serverName)
   }
 }
 
@@ -37,34 +36,18 @@ export function getHackability(ns: NS, serverName: string): number {
 export async function getAllHackableServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
   return results.filter(record => canHack(ns, record.host)).map(record => record.host).sort((a, b) => getHackability(ns, b) - getHackability(ns, a))
-  // .slice(0,6)
-  // .filter((server: string) => ['n00dles'].includes(server));
+  // .slice(0,1)
+  .filter((server: string) => ['n00dles'].includes(server))
 }
 
 export async function getAllHostServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
-  return results.filter(record => canHost(ns, record.host)).map(record => record.host).sort((a,b) => sortHosts(ns,a,b));
+  return results.filter(record => canHost(ns, record.host)).map(record => record.host);
 }
 
 export async function getAccessibleServers(ns: NS): Promise<string[]> {
   const results = await checkServers(ns);
   return results.filter(record => ns.hasRootAccess(record.host)).map(record => record.host);
-}
-
-const sortHosts = (ns: NS, a: string, b: string) => {
-  if (a.includes('hacknet') === b.includes('hacknet')){
-    const memoryDifference = getFreeMemory(ns,b) - getFreeMemory(ns,a);
-    return memoryDifference;
-  }
-
-  return a.includes('hacknet') ? 1 : -1;
-}
-
-const getFreeMemory = (ns: NS, serverName: string) => {
-  const maxMemory = ns.getServerMaxRam(serverName);
-  const usedMemory = ns.getServerUsedRam(serverName);
-
-  return maxMemory - usedMemory;
 }
 
 /** @param {NS} ns */
@@ -116,6 +99,10 @@ function canHost(ns: NS, serverName: string): boolean {
   if (serverName.includes('hacknet')) { 
     return false;
   }
+
+  // if (serverName === 'home') {
+  //   return false;
+  // }
   
   return true;
 }
